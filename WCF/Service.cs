@@ -11,7 +11,7 @@ namespace Insight.WCF
 {
     public class Service
     {
-        private readonly List<ServiceHost> _Hosts = new List<ServiceHost>();
+        private readonly List<ServiceHost> _hosts = new List<ServiceHost>();
 
         /// <summary>
         /// 读取服务目录下的WCF服务库创建WCF服务主机
@@ -25,11 +25,11 @@ namespace Insight.WCF
             foreach (var file in files)
             {
                 var assembly = Assembly.LoadFrom(file.FullName);
-                var product = assembly.GetCustomAttribute<AssemblyProductAttribute>()?.Product;
-                if (product != "WCF Service") continue;
+                var attributes = assembly.GetCustomAttributes(typeof(AssemblyProductAttribute), false);
+                if (attributes.FirstOrDefault() is AssemblyProductAttribute att && att.Product != "WCF Service") continue;
 
                 var name = assembly.GetName();
-                var type = assembly.DefinedTypes.Single(i => i.Name == name.Name);
+                var type = assembly.GetTypes().Single(i => i.Name == name.Name);
                 var ln = name.Name.ToLower();
                 var api = ln.EndsWith("s") ? ln.Substring(0, ln.Length - 1) : ln;
                 var uri = new Uri($"{address}/{api}api/v{name.Version.Major}.{name.Version.Minor}");
@@ -42,7 +42,7 @@ namespace Insight.WCF
         /// </summary>
         public void StartService()
         {
-            var hosts = _Hosts.Where(h => h.State == CommunicationState.Created || h.State == CommunicationState.Closed);
+            var hosts = _hosts.Where(h => h.State == CommunicationState.Created || h.State == CommunicationState.Closed);
             foreach (var host in hosts)
             {
                 host.Open();
@@ -55,7 +55,7 @@ namespace Insight.WCF
         /// <param name="service">服务名称</param>
         public void StartService(string service)
         {
-            var host = _Hosts.SingleOrDefault(h => h.Description.Name == service);
+            var host = _hosts.SingleOrDefault(h => h.Description.Name == service);
             if (host == null || (host.State != CommunicationState.Created && host.State != CommunicationState.Closed)) return;
 
             host.Open();
@@ -66,7 +66,7 @@ namespace Insight.WCF
         /// </summary>
         public void StopService()
         {
-            foreach (var host in _Hosts.Where(host => host.State == CommunicationState.Opened))
+            foreach (var host in _hosts.Where(host => host.State == CommunicationState.Opened))
             {
                 host.Abort();
                 host.Close();
@@ -79,7 +79,7 @@ namespace Insight.WCF
         /// <param name="service">服务名称</param>
         public void StopService(string service)
         {
-            var host = _Hosts.SingleOrDefault(h => h.Description.Name == service);
+            var host = _hosts.SingleOrDefault(h => h.Description.Name == service);
             if (host == null || host.State != CommunicationState.Opened) return;
 
             host.Abort();
@@ -92,11 +92,11 @@ namespace Insight.WCF
         /// <param name="type">TypeInfo</param>
         /// <param name="uri">Uri</param>
         /// <param name="allowOrigin">允许跨域访问的域</param>
-        private void CreateHost(TypeInfo type, Uri uri, string allowOrigin)
+        private void CreateHost(Type type, Uri uri, string allowOrigin)
         {
             var host = new ServiceHost(type, uri);
             var binding = InitBinding();
-            var endpoint = host.AddServiceEndpoint(type.ImplementedInterfaces.First(), binding, "");
+            var endpoint = host.AddServiceEndpoint(type.GetInterfaces().First(), binding, "");
             var behavior = new CustomWebHttpBehavior {AutomaticFormatSelectionEnabled = true, AllowOrigin = allowOrigin};
             endpoint.Behaviors.Add(behavior);
 
@@ -109,7 +109,7 @@ namespace Insight.WCF
                     behavior.MaxItemsInObjectGraph = 2147483647;
                 }
             }*/
-            _Hosts.Add(host);
+            _hosts.Add(host);
             LogToEvent($"WCF 服务{type.Name}已绑定于：{uri}");
         }
 

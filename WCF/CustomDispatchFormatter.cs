@@ -5,6 +5,8 @@ using System.ServiceModel.Channels;
 using System.ServiceModel.Dispatcher;
 using System.ServiceModel.Web;
 using System.Text;
+using Insight.Utils.Common;
+using Insight.Utils.Entity;
 using Newtonsoft.Json;
 
 namespace Insight.WCF
