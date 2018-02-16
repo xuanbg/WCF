@@ -9,13 +9,13 @@ namespace Insight.Utils.Server
 {
     public class Verify
     {
-        private AccessToken _Token;
-        private UriTemplateMatch _Uri;
+        private AccessToken _token;
+        private UriTemplateMatch _uri;
 
         /// <summary>
         /// 验证结果
         /// </summary>
-        public Result<object> Result = new Result<object>();
+        public Result<object> result = new Result<object>();
 
         /// <summary>
         /// Access Token字符串
@@ -29,12 +29,12 @@ namespace Insight.Utils.Server
         {
             get
             {
-                if (_Token != null) return _Token;
+                if (_token != null) return _token;
 
                 var buffer = Convert.FromBase64String(AccessToken);
                 var json = Encoding.UTF8.GetString(buffer);
-                _Token = Util.Deserialize<AccessToken>(json);
-                return _Token;
+                _token = Util.Deserialize<AccessToken>(json);
+                return _token;
             }
         }
 
@@ -49,17 +49,17 @@ namespace Insight.Utils.Server
         {
             if (!GetToken())
             {
-                Result.InvalidAuth();
+                result.InvalidAuth();
                 return;
             }
 
             if (call != null && limit > 0)
             {
-                var key = Util.Hash(Token.id.ToString() + _Uri.Data);
+                var key = Util.Hash(Token.id + _uri.Data);
                 var time = call.LimitCall(key, limit);
                 if (time > 0)
                 {
-                    Result.TooFrequent(time.ToString());
+                    result.TooFrequent(time.ToString());
                     return;
                 }
             }
@@ -68,11 +68,11 @@ namespace Insight.Utils.Server
             var request = new HttpRequest(AccessToken);
             if (!request.Send(url))
             {
-                Result.BadRequest(request.Message);
+                result.BadRequest(request.Message);
                 return;
             }
 
-            Result = Util.Deserialize<Result<object>>(request.Data);
+            result = Util.Deserialize<Result<object>>(request.Data);
         }
 
         /// <summary>
@@ -85,7 +85,7 @@ namespace Insight.Utils.Server
             if (context == null) return false;
 
             var request = context.IncomingRequest;
-            _Uri = request.UriTemplateMatch;
+            _uri = request.UriTemplateMatch;
 
             var headers = request.Headers;
             AccessToken = headers[HttpRequestHeader.Authorization];

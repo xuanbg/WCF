@@ -5,7 +5,7 @@ namespace Insight.Utils.Server
 {
     public class CallManage
     {
-        private readonly ConnectionMultiplexer _Redis;
+        private readonly ConnectionMultiplexer _redis;
 
         /// <summary>
         /// 设置Redis链接参数
@@ -13,7 +13,7 @@ namespace Insight.Utils.Server
         /// <param name="redis">Redis链接对象</param>
         public CallManage(ConnectionMultiplexer redis)
         {
-            _Redis = redis;
+            _redis = redis;
         }
 
         /// <summary>
@@ -27,7 +27,7 @@ namespace Insight.Utils.Server
             var now = DateTime.Now;
             var val = now.ToString("O");
             var ts = new TimeSpan(0, 0, seconds);
-            var db = _Redis.GetDatabase();
+            var db = _redis.GetDatabase();
             var value = db.StringGet(key);
 
             // 初次访问或正常频次访问
