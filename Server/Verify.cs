@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Net;
 using System.ServiceModel.Web;
-using System.Text;
 using Insight.Utils.Common;
 using Insight.Utils.Entity;
 
@@ -9,8 +8,8 @@ namespace Insight.Utils.Server
 {
     public class Verify
     {
-        private AccessToken _token;
-        private UriTemplateMatch _uri;
+        private AccessToken accessToken;
+        private UriTemplateMatch uri;
 
         /// <summary>
         /// 验证结果
@@ -20,7 +19,7 @@ namespace Insight.Utils.Server
         /// <summary>
         /// Access Token字符串
         /// </summary>
-        public string AccessToken { get; private set; }
+        public string token { get; private set; }
 
         /// <summary>
         /// Access Token对象
@@ -29,12 +28,10 @@ namespace Insight.Utils.Server
         {
             get
             {
-                if (_token != null) return _token;
+                if (accessToken != null) return accessToken;
 
-                var buffer = Convert.FromBase64String(AccessToken);
-                var json = Encoding.UTF8.GetString(buffer);
-                _token = Util.Deserialize<AccessToken>(json);
-                return _token;
+                accessToken = Util.Base64ToAccessToken(token);
+                return accessToken;
             }
         }
 
@@ -55,8 +52,8 @@ namespace Insight.Utils.Server
 
             if (call != null && limit > 0)
             {
-                var key = Util.Hash(Token.id + _uri.Data);
-                var time = call.LimitCall(key, limit);
+                var key = Util.Hash(Token.id + uri.Data);
+                var time = call.GetSurplus(key, limit);
                 if (time > 0)
                 {
                     result.TooFrequent(time.ToString());
@@ -65,7 +62,7 @@ namespace Insight.Utils.Server
             }
 
             var url = $"{verifyurl}?action={aid}";
-            var request = new HttpRequest(AccessToken);
+            var request = new HttpRequest(token);
             if (!request.Send(url))
             {
                 result.BadRequest(request.Message);
@@ -85,11 +82,11 @@ namespace Insight.Utils.Server
             if (context == null) return false;
 
             var request = context.IncomingRequest;
-            _uri = request.UriTemplateMatch;
+            uri = request.UriTemplateMatch;
 
             var headers = request.Headers;
-            AccessToken = headers[HttpRequestHeader.Authorization];
-            if (!string.IsNullOrEmpty(AccessToken)) return true;
+            token = headers[HttpRequestHeader.Authorization];
+            if (!string.IsNullOrEmpty(token)) return true;
 
             var response = context.OutgoingResponse;
             response.StatusCode = HttpStatusCode.Unauthorized;
