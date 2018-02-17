@@ -7,7 +7,7 @@ namespace Insight.Utils.Server
     public static class RedisHelper
     {
         private static readonly string redisConn = Util.GetAppSetting("Redis") ?? "localhost:6379";
-        private static readonly string database = Util.GetAppSetting("Database") ?? "1";
+        private static readonly string database = Util.GetAppSetting("Database") ?? "6";
         private static readonly IDatabase redis = ConnectionMultiplexer.Connect(redisConn).GetDatabase(Convert.ToInt32(database));
 
         /// <summary>
