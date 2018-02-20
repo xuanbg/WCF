@@ -2,7 +2,7 @@
 using Insight.Utils.Common;
 using StackExchange.Redis;
 
-namespace Insight.Utils.Server
+namespace Insight.Utils.Redis
 {
     public static class RedisHelper
     {

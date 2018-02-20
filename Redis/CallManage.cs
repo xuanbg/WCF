@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Insight.Utils.Server
+namespace Insight.Utils.Redis
 {
     public class CallManage
     {
