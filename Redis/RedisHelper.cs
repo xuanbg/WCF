@@ -90,7 +90,7 @@ namespace Insight.Utils.Redis
         public static int GetExpiry(string key)
         {
             var ts = redis.StringGetWithExpiry(key).Expiry;
-            return ts?.Seconds ?? 0;
+            return (int) (ts?.TotalSeconds ?? 1);
         }
     }
 }

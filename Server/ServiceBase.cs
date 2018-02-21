@@ -21,9 +21,7 @@ namespace Insight.Utils.Server
         public bool Verify(string key = null)
         {
             var verify = new Verify(verifyUrl, key);
-            userName = verify.Token.userName;
             userId = verify.Token.userId;
-            deptId = verify.Token.deptId;
             result = verify.result;
 
             return result.successful;

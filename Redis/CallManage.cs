@@ -7,7 +7,7 @@ namespace Insight.Utils.Redis
         /// <summary>
         /// 根据传入的时长返回当前调用的剩余限制时间（秒）
         /// </summary>
-        /// <param name="key"></param>
+        /// <param name="key">键值</param>
         /// <param name="seconds">限制访问时长（秒）</param>
         /// <returns>int 剩余限制时间（秒）</returns>
         public int GetSurplus(string key, int seconds)
@@ -36,6 +36,13 @@ namespace Insight.Utils.Redis
             return seconds;
         }
 
+        /// <summary>
+        /// 是否被限流(超过限流计时周期最大访问次数)
+        /// </summary>
+        /// <param name="key">键值</param>
+        /// <param name="seconds">计时周期(秒)</param>
+        /// <param name="max">最大值</param>
+        /// <returns>是否被限流</returns>
         public bool IsLimited(string key, int seconds, int max)
         {
             if (string.IsNullOrEmpty(key) || seconds == 0) return false;
@@ -52,7 +59,7 @@ namespace Insight.Utils.Redis
             // 读取访问次数,如次数超过限制,返回true,否则访问次数增加1次
             var count = Convert.ToInt32(value);
             var expire = RedisHelper.GetExpiry(limitKey);
-            if (count > max) return true;
+            if (count >= max) return true;
 
             count++;
             RedisHelper.StringSet(limitKey, count.ToString(), new TimeSpan(0, 0, expire));
