@@ -6,19 +6,18 @@ using System.Linq;
 using System.Reflection;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
+using Insight.Utils.Common;
 
 namespace Insight.WCF
 {
     public class Service
     {
-        private readonly List<ServiceHost> _hosts = new List<ServiceHost>();
+        private readonly List<ServiceHost> hosts = new List<ServiceHost>();
 
         /// <summary>
         /// 读取服务目录下的WCF服务库创建WCF服务主机
         /// </summary>
-        /// <param name="address">服务基地址</param>
-        /// <param name="allowOrigin">允许跨域访问的域，多个域名使用逗号分隔</param>
-        public void CreateHosts(string address, string allowOrigin)
+        public void CreateHosts()
         {
             var dirInfo = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + "Services");
             var files = dirInfo.GetFiles("*.dll", SearchOption.AllDirectories);
@@ -32,8 +31,8 @@ namespace Insight.WCF
                 var type = assembly.GetTypes().Single(i => i.Name == name.Name);
                 var ln = name.Name.ToLower();
                 var api = ln.EndsWith("s") ? ln.Substring(0, ln.Length - 1) : ln;
-                var uri = new Uri($"{address}/{api}api/v{name.Version.Major}.{name.Version.Minor}");
-                CreateHost(type, uri, allowOrigin);
+                var uri = new Uri($"{Util.GetAppSetting("Address")}/{api}api/v{name.Version.Major}.{name.Version.Minor}");
+                CreateHost(type, uri);
             }
         }
 
@@ -42,8 +41,8 @@ namespace Insight.WCF
         /// </summary>
         public void StartService()
         {
-            var hosts = _hosts.Where(h => h.State == CommunicationState.Created || h.State == CommunicationState.Closed);
-            foreach (var host in hosts)
+            var list = hosts.Where(h => h.State == CommunicationState.Created || h.State == CommunicationState.Closed);
+            foreach (var host in list)
             {
                 host.Open();
             }
@@ -55,7 +54,7 @@ namespace Insight.WCF
         /// <param name="service">服务名称</param>
         public void StartService(string service)
         {
-            var host = _hosts.SingleOrDefault(h => h.Description.Name == service);
+            var host = hosts.SingleOrDefault(h => h.Description.Name == service);
             if (host == null || (host.State != CommunicationState.Created && host.State != CommunicationState.Closed)) return;
 
             host.Open();
@@ -66,7 +65,7 @@ namespace Insight.WCF
         /// </summary>
         public void StopService()
         {
-            foreach (var host in _hosts.Where(host => host.State == CommunicationState.Opened))
+            foreach (var host in hosts.Where(host => host.State == CommunicationState.Opened))
             {
                 host.Abort();
                 host.Close();
@@ -79,7 +78,7 @@ namespace Insight.WCF
         /// <param name="service">服务名称</param>
         public void StopService(string service)
         {
-            var host = _hosts.SingleOrDefault(h => h.Description.Name == service);
+            var host = hosts.SingleOrDefault(h => h.Description.Name == service);
             if (host == null || host.State != CommunicationState.Opened) return;
 
             host.Abort();
@@ -91,13 +90,12 @@ namespace Insight.WCF
         /// </summary>
         /// <param name="type">TypeInfo</param>
         /// <param name="uri">Uri</param>
-        /// <param name="allowOrigin">允许跨域访问的域</param>
-        private void CreateHost(Type type, Uri uri, string allowOrigin)
+        private void CreateHost(Type type, Uri uri)
         {
             var host = new ServiceHost(type, uri);
             var binding = InitBinding();
             var endpoint = host.AddServiceEndpoint(type.GetInterfaces().First(), binding, "");
-            var behavior = new CustomWebHttpBehavior {AutomaticFormatSelectionEnabled = true, AllowOrigin = allowOrigin};
+            var behavior = new CustomWebHttpBehavior {AutomaticFormatSelectionEnabled = true};
             endpoint.Behaviors.Add(behavior);
 
             /* Windows Server 2008 需要设置MaxItemsInObjectGraph值为2147483647
@@ -109,7 +107,7 @@ namespace Insight.WCF
                     behavior.MaxItemsInObjectGraph = 2147483647;
                 }
             }*/
-            _hosts.Add(host);
+            hosts.Add(host);
             LogToEvent($"WCF 服务{type.Name}已绑定于：{uri}");
         }
 

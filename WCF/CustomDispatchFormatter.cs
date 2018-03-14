@@ -12,17 +12,15 @@ namespace Insight.WCF
     public class CustomDispatchFormatter : IDispatchMessageFormatter
     {
         private readonly IDispatchMessageFormatter innerFormatter;
-        private readonly string allowOrigin;
+        private readonly string allowOrigin = Util.GetAppSetting("AllowOrigin");
 
         /// <summary>
         /// 构造方法，传入内置消息格式化器
         /// </summary>
         /// <param name="formatter">内置消息格式化器</param>
-        /// <param name="allowOrigin">允许跨域的源</param>
-        public CustomDispatchFormatter(IDispatchMessageFormatter formatter, string allowOrigin)
+        public CustomDispatchFormatter(IDispatchMessageFormatter formatter)
         {
             innerFormatter = formatter;
-            this.allowOrigin = allowOrigin ?? "";
         }
 
         /// <summary>

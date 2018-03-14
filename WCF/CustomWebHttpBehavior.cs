@@ -5,8 +5,6 @@ namespace Insight.WCF
 {
     public class CustomWebHttpBehavior : WebHttpBehavior
     {
-        public string AllowOrigin { get; set; }
-
         /// <summary>
         /// 设置请求消息反序列化器
         /// </summary>
@@ -16,7 +14,7 @@ namespace Insight.WCF
         protected override IDispatchMessageFormatter GetRequestDispatchFormatter(OperationDescription operationDescription, ServiceEndpoint endpoint)
         {
             var innerFormatter = base.GetRequestDispatchFormatter(operationDescription, endpoint);
-            return new CustomDispatchFormatter(innerFormatter, AllowOrigin);
+            return new CustomDispatchFormatter(innerFormatter);
         }
 
         /// <summary>
@@ -28,7 +26,7 @@ namespace Insight.WCF
         protected override IDispatchMessageFormatter GetReplyDispatchFormatter(OperationDescription operationDescription, ServiceEndpoint endpoint)
         {
             var innerFormatter = base.GetReplyDispatchFormatter(operationDescription, endpoint);
-            return new CustomDispatchFormatter(innerFormatter, AllowOrigin);
+            return new CustomDispatchFormatter(innerFormatter);
         }
 
         /// <summary>

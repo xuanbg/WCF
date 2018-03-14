@@ -41,11 +41,11 @@ namespace Insight.Utils.Server
             var request = new HttpRequest(token);
             if (!request.Send(url))
             {
-                result.BadRequest(request.Message);
+                result.BadRequest(request.message);
                 return false;
             }
 
-            result = Util.Deserialize<Result<Session>>(request.Data);
+            result = Util.Deserialize<Result<Session>>(request.data);
 
             return result.successful;
         }
