@@ -133,7 +133,7 @@ namespace Insight.Utils.Redis
         /// <param name="key">key</param>
         /// <param name="value">value</param>
         /// <returns>bool Has value</returns>
-        public static bool GetSetMember(string key, string value)
+        public static bool SetContains(string key, string value)
         {
             return redis.SetContains(key, value);
         }
