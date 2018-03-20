@@ -96,7 +96,7 @@ namespace Insight.Utils.Redis
         }
 
         /// <summary>
-        /// 保存哈希
+        /// 保存数据到哈希
         /// </summary>
         /// <param name="key">key</param>
         /// <param name="field">field</param>
@@ -107,14 +107,35 @@ namespace Insight.Utils.Redis
         }
 
         /// <summary>
-        /// 读取哈希
+        /// 读取哈希的指定字段
         /// </summary>
         /// <param name="key">key</param>
         /// <param name="field">field</param>
-        /// <returns></returns>
+        /// <returns>string value</returns>
         public static string HashGet(string key, string field)
         {
             return redis.HashGet(key, field);
+        }
+
+        /// <summary>
+        /// 保存数据到集合
+        /// </summary>
+        /// <param name="key">key</param>
+        /// <param name="value">value</param>
+        public static void SetAdd(string key, string value)
+        {
+            redis.SetAdd(key, value);
+        }
+
+        /// <summary>
+        /// 集合中是否包含指定的元素
+        /// </summary>
+        /// <param name="key">key</param>
+        /// <param name="value">value</param>
+        /// <returns>bool Has value</returns>
+        public static bool GetSetMember(string key, string value)
+        {
+            return redis.SetContains(key, value);
         }
 
         /// <summary>
