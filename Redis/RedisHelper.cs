@@ -34,9 +34,21 @@ namespace Insight.Utils.Redis
         /// </summary>
         /// <param name="key">key</param>
         /// <param name="value">value</param>
-        public static void StringSet(string key, string value)
+        /// <param name="time">expiryTime</param>
+        public static void StringSet(string key, object value, DateTime time)
         {
-            redis.StringSet(key, value);
+            StringSet(key, value, time - DateTime.Now);
+        }
+
+        /// <summary>
+        /// 保存字符串
+        /// </summary>
+        /// <param name="key">key</param>
+        /// <param name="value">value</param>
+        /// <param name="time">expiryTime</param>
+        public static void StringSet(string key, string value, DateTime time)
+        {
+            StringSet(key, value, time - DateTime.Now);
         }
 
         /// <summary>
@@ -45,7 +57,18 @@ namespace Insight.Utils.Redis
         /// <param name="key">key</param>
         /// <param name="value">value</param>
         /// <param name="ts">TimeSpan</param>
-        public static void StringSet(string key, string value, TimeSpan ts)
+        public static void StringSet(string key, object value, TimeSpan? ts = null)
+        {
+            StringSet(key, Util.Serialize(value), ts);
+        }
+
+        /// <summary>
+        /// 保存字符串
+        /// </summary>
+        /// <param name="key">key</param>
+        /// <param name="value">value</param>
+        /// <param name="ts">TimeSpan</param>
+        public static void StringSet(string key, string value, TimeSpan? ts = null)
         {
             redis.StringSet(key, value, ts);
         }
@@ -58,6 +81,18 @@ namespace Insight.Utils.Redis
         public static string StringGet(string key)
         {
             return redis.StringGet(key);
+        }
+
+        /// <summary>
+        /// 读取字符串
+        /// </summary>
+        /// <param name="key">key</param>
+        /// <returns>value</returns>
+        public static T StringGet<T>(string key)
+        {
+            var data = redis.StringGet(key);
+
+            return Util.Deserialize<T>(data);
         }
 
         /// <summary>

@@ -1,7 +1,11 @@
-﻿namespace Insight.Utils.Server
+﻿using Insight.Utils.Entity;
+
+namespace Insight.Utils.Server
 {
     public class ServiceBase
     {
+        public Result<object> result { get; private set; }
+
         /// <summary>
         /// 租户ID
         /// </summary>
@@ -32,15 +36,24 @@
         {
             var verify = new Verify();
             key = verify.userId == id ? null : key;
-            if (!verify.Compare(key)) return false;
+            if (verify.Compare(key))
+            {
+                var session = verify.result.data;
+                tenantId = session.tenantId;
+                deptId = session.deptId;
+                userId = session.userId;
+                userName = session.userName;
+            }
 
-            var session = verify.result.data;
-            tenantId = session.tenantId;
-            deptId = session.deptId;
-            userId = session.userId;
-            userName = session.userName;
+            result = new Result<object>
+            {
+                successful = verify.result.successful,
+                code = verify.result.code,
+                name = verify.result.name,
+                message = verify.result.message
+            };
 
-            return true;
+            return result.successful;
         }
     }
 }
