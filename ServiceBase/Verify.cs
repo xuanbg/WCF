@@ -11,7 +11,7 @@ namespace Insight.Utils.Server
         private readonly string token;
 
         // 验证结果
-        public Result<Session> result = new Result<Session>();
+        public Result<UserInfo> result = new Result<UserInfo>();
 
         // 用户ID
         public string userId;
@@ -45,7 +45,7 @@ namespace Insight.Utils.Server
                 return false;
             }
 
-            result = Util.Deserialize<Result<Session>>(request.data);
+            result = Util.Deserialize<Result<UserInfo>>(request.data);
 
             return result.successful;
         }

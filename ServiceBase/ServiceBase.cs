@@ -38,11 +38,11 @@ namespace Insight.Utils.Server
             key = verify.userId == id ? null : key;
             if (verify.Compare(key))
             {
-                var session = verify.result.data;
-                tenantId = session.tenantId;
-                deptId = session.deptId;
-                userId = session.userId;
-                userName = session.userName;
+                var info = verify.result.data;
+                tenantId = info.tenantId;
+                deptId = info.deptId;
+                userId = info.id;
+                userName = info.name;
             }
 
             result = new Result<object>
