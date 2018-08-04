@@ -4,7 +4,7 @@ namespace Insight.Utils.Server
 {
     public class ServiceBase
     {
-        public Result<object> result { get; private set; }
+        public Result<object> result { get; set; }
 
         /// <summary>
         /// 租户ID
