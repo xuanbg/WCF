@@ -1,4 +1,5 @@
-﻿using Insight.Utils.Entity;
+﻿using Insight.Utils.Common;
+using Insight.Utils.Entity;
 
 namespace Insight.Utils.Server
 {
@@ -54,6 +55,17 @@ namespace Insight.Utils.Server
             };
 
             return result.successful;
+        }
+
+        /// <summary>
+        /// 获取客户端特征指纹
+        /// </summary>
+        /// <returns>string 客户端特征指纹</returns>
+        public string getFingerprint()
+        {
+            var verify = new Verify();
+
+            return Util.Hash(verify.ip + verify.userAgent);
         }
     }
 }
