@@ -34,7 +34,8 @@ namespace Insight.Utils.Server
             var request = context.IncomingRequest;
             var headers = request.Headers;
             ip = GetIp(headers);
-            userAgent = headers.Get("user-agent");
+            userAgent = request.UserAgent;
+
             token = headers[HttpRequestHeader.Authorization];
             userId = Util.Base64ToAccessToken(token)?.userId;
         }
