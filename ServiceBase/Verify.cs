@@ -8,7 +8,7 @@ namespace Insight.Utils.Server
 {
     public class Verify
     {
-        private readonly string baseServer = Util.GetAppSetting("BaseServer");
+        private readonly string baseServer = Util.getAppSetting("BaseServer");
         private readonly string token;
 
         // 验证结果
@@ -33,11 +33,11 @@ namespace Insight.Utils.Server
 
             var request = context.IncomingRequest;
             var headers = request.Headers;
-            ip = GetIp(headers);
+            ip = getIp(headers);
             userAgent = request.UserAgent;
 
             token = headers[HttpRequestHeader.Authorization];
-            userId = Util.Base64ToAccessToken(token)?.userId;
+            userId = Util.base64ToAccessToken(token)?.userId;
         }
 
         /// <summary>
@@ -45,17 +45,17 @@ namespace Insight.Utils.Server
         /// </summary>
         /// <param name="key">操作权限代码，默认为空，即不进行鉴权</param>
         /// <returns>boll 是否通过验证</returns>
-        public bool Compare(string key = null)
+        public bool compare(string key = null)
         {
             var url = $"{baseServer}/authapi/v1.0/tokens/verify?action={key}";
             var request = new HttpRequest(token);
-            if (!request.Send(url))
+            if (!request.send(url))
             {
-                result.BadRequest(request.message);
+                result.badRequest(request.message);
                 return false;
             }
 
-            result = Util.Deserialize<Result<UserInfo>>(request.data);
+            result = Util.deserialize<Result<UserInfo>>(request.data);
 
             return result.successful;
         }
@@ -65,7 +65,7 @@ namespace Insight.Utils.Server
         /// </summary>
         /// <param name="headers">请求头</param>
         /// <returns>string IP地址</returns>
-        private static string GetIp(NameValueCollection headers)
+        private static string getIp(NameValueCollection headers)
         {
             var rip = headers.Get("X-Real-IP");
             if (string.IsNullOrEmpty(rip))

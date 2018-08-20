@@ -10,7 +10,7 @@ namespace Insight.Utils.Redis
         /// <param name="key">键值</param>
         /// <param name="seconds">限制访问时长（秒）</param>
         /// <returns>int 剩余限制时间（秒）</returns>
-        public int GetSurplus(string key, int seconds)
+        public int getSurplus(string key, int seconds)
         {
             if (string.IsNullOrEmpty(key) || seconds == 0) return 0;
 
@@ -19,10 +19,10 @@ namespace Insight.Utils.Redis
             var ts = new TimeSpan(0, 0, seconds);
 
             var limitKey = "Limit:" + key;
-            var value = RedisHelper.StringGet(limitKey);
+            var value = RedisHelper.stringGet(limitKey);
             if (string.IsNullOrEmpty(value))
             {
-                RedisHelper.StringSet(limitKey, val, ts);
+                RedisHelper.stringSet(limitKey, val, ts);
                 return 0;
             }
 
@@ -32,7 +32,7 @@ namespace Insight.Utils.Redis
             if (surplus > 1) return surplus < 0 ? 0 : surplus;
 
             // 调用时间间隔低于1秒时,重置调用时间为当前时间作为惩罚
-            RedisHelper.StringSet(limitKey, val, ts);
+            RedisHelper.stringSet(limitKey, val, ts);
             return seconds;
         }
 
@@ -43,26 +43,26 @@ namespace Insight.Utils.Redis
         /// <param name="seconds">计时周期(秒)</param>
         /// <param name="max">最大值</param>
         /// <returns>是否被限流</returns>
-        public bool IsLimited(string key, int seconds, int max)
+        public bool isLimited(string key, int seconds, int max)
         {
             if (string.IsNullOrEmpty(key) || seconds == 0) return false;
 
             var ts = new TimeSpan(0, 0, seconds);
             var limitKey = "Limit:" + key;
-            var value = RedisHelper.StringGet(limitKey);
+            var value = RedisHelper.stringGet(limitKey);
             if (string.IsNullOrEmpty(value))
             {
-                RedisHelper.StringSet(limitKey, "1", ts);
+                RedisHelper.stringSet(limitKey, "1", ts);
                 return false;
             }
 
             // 读取访问次数,如次数超过限制,返回true,否则访问次数增加1次
             var count = Convert.ToInt32(value);
-            var expire = RedisHelper.GetExpiry(limitKey);
+            var expire = RedisHelper.getExpiry(limitKey);
             if (count >= max) return true;
 
             count++;
-            RedisHelper.StringSet(limitKey, count.ToString(), new TimeSpan(0, 0, expire));
+            RedisHelper.stringSet(limitKey, count.ToString(), new TimeSpan(0, 0, expire));
             return false;
         }
     }

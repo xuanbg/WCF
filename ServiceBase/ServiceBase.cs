@@ -33,11 +33,11 @@ namespace Insight.Utils.Server
         /// <param name="key">操作权限代码，默认为空，即不进行鉴权</param>
         /// <param name="id">用户ID</param>
         /// <returns>bool 身份是否通过验证</returns>
-        public bool Verify(string key = null, string id = null)
+        public bool verify(string key = null, string id = null)
         {
             var verify = new Verify();
             key = verify.userId == id ? null : key;
-            if (verify.Compare(key))
+            if (verify.compare(key))
             {
                 var info = verify.result.data;
                 tenantId = info.tenantId;
@@ -65,7 +65,7 @@ namespace Insight.Utils.Server
         {
             var verify = new Verify();
 
-            return Util.Hash(verify.ip + verify.userAgent);
+            return Util.hash(verify.ip + verify.userAgent);
         }
     }
 }

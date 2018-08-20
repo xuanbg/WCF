@@ -17,7 +17,7 @@ namespace Insight.WCF
         /// <summary>
         /// 读取服务目录下的WCF服务库创建WCF服务主机
         /// </summary>
-        public void CreateHosts()
+        public void createHosts()
         {
             var dirInfo = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + "Services");
             var files = dirInfo.GetFiles("*.dll", SearchOption.AllDirectories);
@@ -31,15 +31,15 @@ namespace Insight.WCF
                 var type = assembly.GetTypes().Single(i => i.Name == name.Name);
                 var ln = name.Name.ToLower();
                 var api = ln.EndsWith("s") ? ln.Substring(0, ln.Length - 1) : ln;
-                var uri = new Uri($"{Util.GetAppSetting("Address")}/{api}api/v{name.Version.Major}.{name.Version.Minor}");
-                CreateHost(type, uri);
+                var uri = new Uri($"{Util.getAppSetting("Address")}/{api}api/v{name.Version.Major}.{name.Version.Minor}");
+                createHost(type, uri);
             }
         }
 
         /// <summary>
         /// 启动服务列表中的全部服务
         /// </summary>
-        public void StartService()
+        public void startService()
         {
             var list = hosts.Where(h => h.State == CommunicationState.Created || h.State == CommunicationState.Closed);
             foreach (var host in list)
@@ -52,7 +52,7 @@ namespace Insight.WCF
         /// 启动服务列表中的服务
         /// </summary>
         /// <param name="service">服务名称</param>
-        public void StartService(string service)
+        public void startService(string service)
         {
             var host = hosts.SingleOrDefault(h => h.Description.Name == service);
             if (host == null || (host.State != CommunicationState.Created && host.State != CommunicationState.Closed)) return;
@@ -63,7 +63,7 @@ namespace Insight.WCF
         /// <summary>
         /// 停止服务列表中的全部服务
         /// </summary>
-        public void StopService()
+        public void stopService()
         {
             foreach (var host in hosts.Where(host => host.State == CommunicationState.Opened))
             {
@@ -76,7 +76,7 @@ namespace Insight.WCF
         /// 停止服务列表中的服务
         /// </summary>
         /// <param name="service">服务名称</param>
-        public void StopService(string service)
+        public void stopService(string service)
         {
             var host = hosts.SingleOrDefault(h => h.Description.Name == service);
             if (host == null || host.State != CommunicationState.Opened) return;
@@ -90,10 +90,10 @@ namespace Insight.WCF
         /// </summary>
         /// <param name="type">TypeInfo</param>
         /// <param name="uri">Uri</param>
-        private void CreateHost(Type type, Uri uri)
+        private void createHost(Type type, Uri uri)
         {
             var host = new ServiceHost(type, uri);
-            var binding = InitBinding();
+            var binding = initBinding();
             var endpoint = host.AddServiceEndpoint(type.GetInterfaces().First(), binding, "");
             var behavior = new CustomWebHttpBehavior {AutomaticFormatSelectionEnabled = true};
             endpoint.Behaviors.Add(behavior);
@@ -108,13 +108,13 @@ namespace Insight.WCF
                 }
             }*/
             hosts.Add(host);
-            LogToEvent($"WCF 服务{type.Name}已绑定于：{uri}");
+            logToEvent($"WCF 服务{type.Name}已绑定于：{uri}");
         }
 
         /// <summary>
         /// 初始化基本HTTP服务绑定
         /// </summary>
-        private CustomBinding InitBinding()
+        private CustomBinding initBinding()
         {
             var encoder = new WebMessageEncodingBindingElement
             {
@@ -141,7 +141,7 @@ namespace Insight.WCF
         /// 将事件消息写入系统日志
         /// </summary>
         /// <param name="message"></param>
-        public void LogToEvent(string message)
+        public void logToEvent(string message)
         {
             if (!EventLog.SourceExists("WCF Service"))
             {

@@ -12,7 +12,7 @@ namespace Insight.WCF
     public class CustomDispatchFormatter : IDispatchMessageFormatter
     {
         private readonly IDispatchMessageFormatter innerFormatter;
-        private readonly string allowOrigin = Util.GetAppSetting("AllowOrigin");
+        private readonly string allowOrigin = Util.getAppSetting("AllowOrigin");
 
         /// <summary>
         /// 构造方法，传入内置消息格式化器
@@ -46,8 +46,8 @@ namespace Insight.WCF
             if (context == null) throw new Exception("Unknown exception");
 
             var encoding = context.IncomingRequest.Headers[HttpRequestHeader.AcceptEncoding] ?? "";
-            var model = encoding.Contains("gzip") ? CompressType.Gzip : encoding.Contains("deflate") ? CompressType.Deflate : CompressType.None;
-            var bytes = Util.JsonWrite(result, model);
+            var model = encoding.Contains("gzip") ? CompressType.GZIP : encoding.Contains("deflate") ? CompressType.DEFLATE : CompressType.NONE;
+            var bytes = Util.jsonWrite(result, model);
 
             // 根据AcceptEncoding在响应头中设置ContentEncoding的值
             var headers = context.OutgoingResponse.Headers;

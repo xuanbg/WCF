@@ -6,8 +6,8 @@ namespace Insight.Utils.Redis
 {
     public static class RedisHelper
     {
-        private static readonly string redisConn = Util.GetAppSetting("Redis") ?? "localhost:6379";
-        private static readonly string database = Util.GetAppSetting("Database") ?? "6";
+        private static readonly string redisConn = Util.getAppSetting("Redis") ?? "localhost:6379";
+        private static readonly string database = Util.getAppSetting("Database") ?? "6";
         private static readonly IDatabase redis = ConnectionMultiplexer.Connect(redisConn).GetDatabase(Convert.ToInt32(database));
 
         /// <summary>
@@ -15,7 +15,7 @@ namespace Insight.Utils.Redis
         /// </summary>
         /// <param name="key">key</param>
         /// <returns>是否存在</returns>
-        public static bool HasKey(string key)
+        public static bool hasKey(string key)
         {
             return redis.KeyExists(key);
         }
@@ -24,7 +24,7 @@ namespace Insight.Utils.Redis
         /// 删除指定的Key
         /// </summary>
         /// <param name="key">key</param>
-        public static void Delete(string key)
+        public static void delete(string key)
         {
             redis.KeyDelete(key);
         }
@@ -35,9 +35,9 @@ namespace Insight.Utils.Redis
         /// <param name="key">key</param>
         /// <param name="value">value</param>
         /// <param name="time">expiryTime</param>
-        public static void StringSet(string key, object value, DateTime time)
+        public static void stringSet(string key, object value, DateTime time)
         {
-            StringSet(key, value, time - DateTime.Now);
+            stringSet(key, value, time - DateTime.Now);
         }
 
         /// <summary>
@@ -46,9 +46,9 @@ namespace Insight.Utils.Redis
         /// <param name="key">key</param>
         /// <param name="value">value</param>
         /// <param name="time">expiryTime</param>
-        public static void StringSet(string key, string value, DateTime time)
+        public static void stringSet(string key, string value, DateTime time)
         {
-            StringSet(key, value, time - DateTime.Now);
+            stringSet(key, value, time - DateTime.Now);
         }
 
         /// <summary>
@@ -57,9 +57,9 @@ namespace Insight.Utils.Redis
         /// <param name="key">key</param>
         /// <param name="value">value</param>
         /// <param name="ts">TimeSpan</param>
-        public static void StringSet(string key, object value, TimeSpan? ts = null)
+        public static void stringSet(string key, object value, TimeSpan? ts = null)
         {
-            StringSet(key, Util.Serialize(value), ts);
+            stringSet(key, Util.serialize(value), ts);
         }
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace Insight.Utils.Redis
         /// <param name="key">key</param>
         /// <param name="value">value</param>
         /// <param name="ts">TimeSpan</param>
-        public static void StringSet(string key, string value, TimeSpan? ts = null)
+        public static void stringSet(string key, string value, TimeSpan? ts = null)
         {
             redis.StringSet(key, value, ts);
         }
@@ -78,7 +78,7 @@ namespace Insight.Utils.Redis
         /// </summary>
         /// <param name="key">key</param>
         /// <returns>value</returns>
-        public static string StringGet(string key)
+        public static string stringGet(string key)
         {
             return redis.StringGet(key);
         }
@@ -88,11 +88,11 @@ namespace Insight.Utils.Redis
         /// </summary>
         /// <param name="key">key</param>
         /// <returns>value</returns>
-        public static T StringGet<T>(string key)
+        public static T stringGet<T>(string key)
         {
             var data = redis.StringGet(key);
 
-            return Util.Deserialize<T>(data);
+            return Util.deserialize<T>(data);
         }
 
         /// <summary>
@@ -101,7 +101,7 @@ namespace Insight.Utils.Redis
         /// <param name="key">key</param>
         /// <param name="field">field</param>
         /// <param name="value">value</param>
-        public static void HashSet(string key, string field, string value)
+        public static void hashSet(string key, string field, string value)
         {
             redis.HashSet(key, field, value);
         }
@@ -112,7 +112,7 @@ namespace Insight.Utils.Redis
         /// <param name="key">key</param>
         /// <param name="field">field</param>
         /// <returns>string value</returns>
-        public static string HashGet(string key, string field)
+        public static string hashGet(string key, string field)
         {
             return redis.HashGet(key, field);
         }
@@ -122,7 +122,7 @@ namespace Insight.Utils.Redis
         /// </summary>
         /// <param name="key">key</param>
         /// <param name="value">value</param>
-        public static void SetAdd(string key, string value)
+        public static void setAdd(string key, string value)
         {
             redis.SetAdd(key, value);
         }
@@ -133,7 +133,7 @@ namespace Insight.Utils.Redis
         /// <param name="key">key</param>
         /// <param name="value">value</param>
         /// <returns>bool Has value</returns>
-        public static bool SetContains(string key, string value)
+        public static bool setContains(string key, string value)
         {
             return redis.SetContains(key, value);
         }
@@ -143,7 +143,7 @@ namespace Insight.Utils.Redis
         /// </summary>
         /// <param name="key">key</param>
         /// <returns>剩余有效时间(秒)</returns>
-        public static int GetExpiry(string key)
+        public static int getExpiry(string key)
         {
             var ts = redis.StringGetWithExpiry(key).Expiry;
             return (int) (ts?.TotalSeconds ?? 1);
