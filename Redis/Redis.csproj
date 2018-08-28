@@ -47,6 +47,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CallManage.cs" />
+    <Compile Include="Generator.cs" />
+    <Compile Include="LockHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RedisHelper.cs" />
   </ItemGroup>
