@@ -15,13 +15,13 @@ namespace Insight.Utils.Server
         public Result<UserInfo> result = new Result<UserInfo>();
 
         // 用户ID
-        public string userId;
+        public readonly string userId;
 
         // 客户端IP地址
-        public string ip;
+        public readonly string ip;
 
         // 客户端信息
-        public string userAgent;
+        public readonly string userAgent;
 
         /// <summary>
         /// 构造函数

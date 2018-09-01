@@ -5,17 +5,40 @@ namespace Insight.Utils.Server
 {
     public class ServiceBase
     {
+        /// <summary>
+        /// 验证结果
+        /// </summary>
         public Result<object> result { get; set; }
+
+        /// <summary>
+        /// 应用ID
+        /// </summary>
+        public string appId { get; set; }
 
         /// <summary>
         /// 租户ID
         /// </summary>
-        public string tenantId { get; private set; }
+        public string tenantId { get; set; }
+
+        /// <summary>
+        /// 租户名称
+        /// </summary>
+        public string tenantName { get; set; }
 
         /// <summary>
         /// 登录部门ID
         /// </summary>
-        public string deptId { get; private set; }
+        public string deptId { get; set; }
+
+        /// <summary>
+        /// 登录部门编码
+        /// </summary>
+        public string deptCode { get; set; }
+
+        /// <summary>
+        /// 登录部门名称
+        /// </summary>
+        public string deptName { get; set; }
 
         /// <summary>
         /// 用户ID
@@ -40,8 +63,12 @@ namespace Insight.Utils.Server
             if (verify.compare(key))
             {
                 var info = verify.result.data;
+                appId = info.appId;
                 tenantId = info.tenantId;
+                tenantName = info.tenantName;
                 deptId = info.deptId;
+                deptCode = info.deptCode;
+                deptName = info.deptName;
                 userId = info.id;
                 userName = info.name;
             }
