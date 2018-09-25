@@ -19,15 +19,15 @@ namespace Insight.Utils.Redis
             var index = format.IndexOf("#", StringComparison.Ordinal);
             if (index < 0) return null;
 
+            var digits = format.Substring(index + 1, 1);
+            var len = Convert.ToInt32(digits);
+            if (len < 2 || len > 8) return null;
+
             format = replace(format);
             group = replace(group);
 
-            var digits = format.Substring(index + 1, 1);
             var key = $"CodeGroup:{group}#{digits}";
             if (!LockHandler.getLock(group, 10)) return null;
-
-            var len = Convert.ToInt32(digits);
-            if (len < 2 || len > 8) return null;
 
             var number = random.Next((int) Math.Pow(10, len));
             var val = RedisHelper.stringGet(key);
@@ -91,11 +91,11 @@ namespace Insight.Utils.Redis
         private static string garble(string str)
         {
             var len = str.Length;
-            var frist = len > 2 ? str.Substring(0, 1) : "";
+            var first = len > 2 ? str.Substring(0, 1) : "";
             var high = len > 2 ? str.Substring(1, len - 3) : "";
             var low = garbleSet[str.Substring(len - 2, 2)];
 
-            return high + low + frist;
+            return high + low + first;
         }
 
         /// <summary>
