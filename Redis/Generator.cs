@@ -13,8 +13,9 @@ namespace Insight.Utils.Redis
         /// </summary>
         /// <param name="format">编码格式</param>
         /// <param name="group">分组格式</param>
+        /// <param name="isEncrypt">是否加密流水号</param>
         /// <returns>业务编码</returns>
-        public static string newCode(string format, string group)
+        public static string newCode(string format, string group, bool isEncrypt = true)
         {
             var index = format.IndexOf("#", StringComparison.Ordinal);
             if (index < 0) return null;
@@ -29,7 +30,7 @@ namespace Insight.Utils.Redis
             var key = $"CodeGroup:{group}#{digits}";
             if (!LockHandler.getLock(group, 10)) return null;
 
-            var number = random.Next((int) Math.Pow(10, len));
+            var number = isEncrypt ? random.Next((int) Math.Pow(10, len)) : 0;
             var val = RedisHelper.stringGet(key);
             if (!string.IsNullOrEmpty(val)) number = Convert.ToInt32(val) + 1;
 
@@ -37,7 +38,7 @@ namespace Insight.Utils.Redis
             var i = len - 1;
             if (garbleSet == null) initSet();
 
-            while (i > 0)
+            while (isEncrypt && i > 0)
             {
                 code = garble(code);
                 i--;
