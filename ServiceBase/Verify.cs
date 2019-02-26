@@ -47,7 +47,7 @@ namespace Insight.Utils.Server
         /// <returns>boll 是否通过验证</returns>
         public bool compare(string key = null)
         {
-            var url = $"{baseServer}/authapi/v1.0/tokens/verify?action={key}";
+            var url = $"{baseServer}/authapi/v1.0/tokens/secret?action={key}";
             var request = new HttpRequest(token);
             if (!request.send(url))
             {
