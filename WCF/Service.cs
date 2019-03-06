@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.ServiceModel;
-using System.Xml;
+using System.ServiceModel.Channels;
 using Insight.Utils.Common;
 
 namespace Insight.WCF
@@ -113,18 +113,25 @@ namespace Insight.WCF
         /// <summary>
         /// 初始化基本HTTP服务绑定
         /// </summary>
-        private WebHttpBinding initBinding()
+        private CustomBinding initBinding()
         {
-            var binding = new WebHttpBinding
+            var encoder = new WebMessageEncodingBindingElement
+            {
+                ReaderQuotas = { MaxArrayLength = 67108864, MaxStringContentLength = 67108864 }
+            };
+            var transport = new HttpTransportBindingElement
+            {
+                ManualAddressing = true,
+                MaxReceivedMessageSize = 1073741824,
+                TransferMode = TransferMode.Streamed
+            };
+            var binding = new CustomBinding
             {
                 SendTimeout = TimeSpan.FromSeconds(600),
                 ReceiveTimeout = TimeSpan.FromSeconds(600),
-                ReaderQuotas = new XmlDictionaryReaderQuotas {MaxArrayLength = 67108864, MaxStringContentLength = 67108864},
-                TransferMode = TransferMode.Streamed,
-                MaxReceivedMessageSize = 1073741824,
-                ContentTypeMapper = new CustomContentTypeMapper()
             };
 
+            binding.Elements.AddRange(encoder, transport);
             return binding;
         }
 
