@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.ServiceModel;
-using System.ServiceModel.Channels;
+using System.Xml;
 using Insight.Utils.Common;
 
 namespace Insight.WCF
@@ -97,7 +97,6 @@ namespace Insight.WCF
             var endpoint = host.AddServiceEndpoint(type.GetInterfaces().First(), binding, "");
             var behavior = new CustomWebHttpBehavior {AutomaticFormatSelectionEnabled = true};
             endpoint.Behaviors.Add(behavior);
-
             /* Windows Server 2008 需要设置MaxItemsInObjectGraph值为2147483647
             foreach (var operation in endpoint.Contract.Operations)
             {
@@ -114,26 +113,18 @@ namespace Insight.WCF
         /// <summary>
         /// 初始化基本HTTP服务绑定
         /// </summary>
-        private CustomBinding initBinding()
+        private WebHttpBinding initBinding()
         {
-            var encoder = new WebMessageEncodingBindingElement
-            {
-                ReaderQuotas = {MaxArrayLength = 67108864, MaxStringContentLength = 67108864}
-            };
-            var transport = new HttpTransportBindingElement
-            {
-                ManualAddressing = true,
-                MaxReceivedMessageSize = 1073741824,
-                TransferMode = TransferMode.Streamed
-            };
-            var binding = new CustomBinding
+            var binding = new WebHttpBinding
             {
                 SendTimeout = TimeSpan.FromSeconds(600),
-                ReceiveTimeout = TimeSpan.FromSeconds(600)
+                ReceiveTimeout = TimeSpan.FromSeconds(600),
+                ReaderQuotas = new XmlDictionaryReaderQuotas {MaxArrayLength = 67108864, MaxStringContentLength = 67108864},
+                TransferMode = TransferMode.Streamed,
+                MaxReceivedMessageSize = 1073741824,
+                ContentTypeMapper = new CustomContentTypeMapper()
             };
 
-            //var gZipEncode = new CompressEncodingBindingElement(encoder);
-            binding.Elements.AddRange(encoder, transport);
             return binding;
         }
 
